@@ -1,0 +1,20 @@
+<div .row>
+  <div .span6 .task id="task-#{showKey $ tid taskInfo}">
+    <div .row>
+      <div .row .span5>
+        <div .taskname> #{name taskInfo}
+        <div .tags> #{taskTagsText taskInfo}
+      <div .span1 .tasktime> #{showNominalDiffTime $ taskTotalTime taskInfo}
+    <div .row>
+      <div .span6>
+        <div .sessions .hidden>
+          $forall (date, sess) <- partitionSessions $ sessions taskInfo
+            <div .date> ‣ #{date}
+              $forall (start, end) <- sess
+                <table .times>
+                  <tr>
+                    <td> •
+                    <td> #{formatToD start}
+                    <td> -
+                    <td> #{formatToD end}
+                    <td> (#{showNominalDiffTime $ sessionDiff (start, end)})

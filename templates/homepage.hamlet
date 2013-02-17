@@ -1,0 +1,17 @@
+<div .row>
+  <div .span6 .offset1>
+    <h1> TimeTrackR
+    <div #searchbar>
+      <label for="search"> Search
+      <input type="search" name="search" placeholder="Search">
+    <div #addtask>
+      <label for="addtask"> Add a new task
+      <input type="text" name="addtask" placeholder"Add task">
+    <div .row>
+      <div .span6>
+        <h2> Tasks
+    <div .row>
+      <div .span6>
+        <div #tasks>
+          $forall w <- taskInfoWidgets
+            ^{w}

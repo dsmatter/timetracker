@@ -1,0 +1,20 @@
+Task
+    name Text
+    UniqueTask name
+    deriving Show
+Tag
+    name Text
+    UniqueTag name
+    deriving Show
+TaskTag
+    task TaskId
+    tag  TagId
+    deriving Show
+TaskLog
+    task TaskId
+    start ZonedTime
+    end ZonedTime
+    deriving Show
+
+
+ -- By default this file is used in Model.hs (which is imported by Foundation.hs)
