@@ -1,10 +1,13 @@
 <div .row>
   <div .span6 .task id="task-#{showKey $ tid taskInfo}">
     <div .row>
-      <div .row .span5>
+      <div .row .span4>
         <div .taskname> #{name taskInfo}
         <div .tags> #{taskTagsText taskInfo}
       <div .span1 .tasktime> #{showNominalDiffTime $ taskTotalTime taskInfo}
+      <div .span1 .actions>
+        <div .edit> (e)
+        <div .delete> (x)
     <div .row>
       <div .span6>
         <div .sessions .hidden>

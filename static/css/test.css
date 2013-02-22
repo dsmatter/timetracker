@@ -68,3 +68,11 @@ footer {
 .times {
   margin-left: 10px;
 }
+
+.delete {
+  display: inline;
+}
+
+.edit {
+  display: inline;
+}

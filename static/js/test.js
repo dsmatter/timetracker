@@ -36,7 +36,7 @@
   sumUpSessions = function() {
     var hours, mins, n, sHours, sMins;
     n = sumUpSessionsNum();
-    hours = parseInt(n / 60);
+    hours = parseInt(n / 60, 10);
     mins = n % 60;
     sHours = hours < 10 ? "0" + hours : hours.toString();
     sMins = mins < 10 ? "0" + mins : mins.toString();
@@ -45,7 +45,7 @@
 
   addTotal = function() {
     var template;
-    template = '<div class="row"><div class="span6 total"><div class="row">' + '<div class="span5">Total</div><div class="span1">' + sumUpSessions() + '</div></div></div></div>';
+    template = '<div class="row"><div class="span6 total"><div class="row">' + '<div class="span4">Total</div><div class="span1">' + sumUpSessions() + '</div></div></div></div>';
     return $(".task").last().parent().parent().append(template);
   };
 
