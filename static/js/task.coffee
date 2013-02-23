@@ -41,7 +41,8 @@ define ['components/flight/lib/component', 'ajax'], (defineComponent, ajax) ->
 
     @after "initialize", ->
       @$node.find(".delete").click =>
-        @trigger "delete"
+        if confirm "Delete task '" + @$node.find(".taskname").text() + "'?"
+          @trigger "delete"
       @$node.find(".edit").click =>
         @trigger "edit"
 
