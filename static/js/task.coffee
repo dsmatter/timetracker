@@ -78,7 +78,7 @@ define ['components/flight/lib/component', 'ajax', 'time'], (defineComponent, aj
         @trigger "edit"
 
       @$node.find(".info").click =>
-        if @$nod  e.find(".running").length > 0
+        if @$node.find(".running").length > 0
           @trigger "stop"
         else
           @trigger "start"
