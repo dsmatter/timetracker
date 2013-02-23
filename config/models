@@ -1,4 +1,10 @@
+User
+    username Text Eq
+    password Text
+    salt     Text
+    UniqueUser username
 Task
+    user UserId
     name Text
     UniqueTask name
     deriving Show
@@ -20,6 +26,3 @@ TaskStart
     start ZonedTime
     UniqueTaskStart task
     deriving Show
-
-
- -- By default this file is used in Model.hs (which is imported by Foundation.hs)

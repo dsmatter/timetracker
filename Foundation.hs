@@ -4,7 +4,7 @@ import Prelude
 import Yesod
 import Yesod.Static
 import Yesod.Auth
-import Yesod.Auth.HashDB
+import Yesod.Auth.HashDB (authHashDB, getAuthIdHashDB)
 import Yesod.Default.Config
 import Yesod.Default.Util (addStaticContentExternal)
 import Network.HTTP.Conduit (Manager)
@@ -98,6 +98,13 @@ instance Yesod App where
 
     -- The page to be redirected to when authentication is required.
     authRoute _ = Just $ AuthR LoginR
+
+    isAuthorized (AuthR _) _ = return Authorized
+    isAuthorized _ _ = do
+        mu <- maybeAuthId
+        return $ case mu of
+            Nothing -> AuthenticationRequired
+            Just _ -> Authorized
 
     -- This function creates static content files in the static folder
     -- and names them based on a hash of their content. This allows

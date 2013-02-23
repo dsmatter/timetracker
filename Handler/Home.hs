@@ -14,6 +14,7 @@ import Data.Maybe
 import Text.Printf
 import Data.Aeson (ToJSON)
 import Database.Persist.Store
+import Yesod.Auth
 import qualified Data.Text as T
 import qualified Data.Conduit as C
 import qualified Data.Conduit.List as CL
@@ -111,6 +112,25 @@ secondsSince zt = do
   now <- getZonedTime
   return $ sessionDiff (now, zt)
 
+getUser :: Handler UserId
+getUser = do
+  muser <- maybeAuthId
+  case muser of
+    Nothing -> permissionDenied "Login, please"
+    Just u -> return u
+
+checkTaskPermission :: Task -> Handler ()
+checkTaskPermission task' = do
+  uid <- getUser
+  case (taskUser task') of
+    tuid | tuid == uid -> return ()
+         | otherwise -> permissionDenied "That's not your task!"
+
+checkTaskIdPermission :: TaskId -> Handler ()
+checkTaskIdPermission tid' = do
+  task' <- runDB $ fmap fromJust $ get tid'
+  checkTaskPermission task'
+
 getTaskInfo :: TaskId -> Handler TaskInfo
 getTaskInfo tid' = do
     let logJoin = (selectOneMany (TaskLogTask <-.) taskLogTask) \
@@ -130,7 +150,8 @@ getTaskInfo tid' = do
 
 getAllTaskInfo :: Handler [TaskInfo]
 getAllTaskInfo = do
-    runDB $ (selectKeys [] [] C.$= CL.mapM (lift . getTaskInfo)) C.$$ CL.consume
+  uid <- getUser
+  runDB $ (selectKeys [TaskUser ==. uid] [] C.$= CL.mapM (lift . getTaskInfo)) C.$$ CL.consume
 
 getPartialTaskHtml :: TaskId -> Handler RepHtml
 getPartialTaskHtml tid' = do
@@ -139,11 +160,11 @@ getPartialTaskHtml tid' = do
 
 getHomeR :: Handler RepHtml
 getHomeR = do
-    defaultLayout $ do
-        setTitle "TimeTrackR"
-        taskInfos <- lift getAllTaskInfo
-        let taskInfoWidgets = map (\taskInfo -> $(widgetFile "taskInfoWidget")) taskInfos
-        $(widgetFile "homepage")
+  defaultLayout $ do
+    setTitle "TimeTrackR"
+    taskInfos <- lift getAllTaskInfo
+    let taskInfoWidgets = map (\taskInfo -> $(widgetFile "taskInfoWidget")) taskInfos
+    $(widgetFile "homepage")
 
 
 postAddTaskR :: Handler RepHtml
@@ -153,8 +174,9 @@ postAddTaskR = do
         Nothing -> invalidArgs ["name"]
         Just taskName' -> do
             -- Insert the new task
+            uid <- getUser
             let (name', tags') = extractTags taskName'
-            taskId <- runDB $ insert $ Task name'
+            taskId <- runDB $ insert $ Task uid name'
             -- Set the associated tags
             tagIds <- mapM getTagId tags'
             setTaskTags taskId tagIds
@@ -163,11 +185,13 @@ postAddTaskR = do
 
 deleteTaskR :: TaskId -> Handler RepPlain
 deleteTaskR tid' = do
-    runDB $ delete tid'
-    return $ RepPlain "deleted"
+  checkTaskIdPermission tid'
+  runDB $ delete tid'
+  return $ RepPlain "deleted"
 
 putTaskR :: TaskId -> Handler RepHtml
 putTaskR tid' = do
+  checkTaskIdPermission tid'
   mTaskName <- lookupPostParam "name"
   case mTaskName of
     Nothing -> invalidArgs ["name"]
@@ -189,6 +213,7 @@ postTaskStartR tid' = do
 
 postTaskStopR :: TaskId -> Handler RepHtml
 postTaskStopR tid' = do
+  checkTaskIdPermission tid'
   now <- liftIO getZonedTime
   mstart <- runDB $ getBy $ UniqueTaskStart tid'
   case mstart of
@@ -201,6 +226,7 @@ postTaskStopR tid' = do
 
 getTaskSummaryR :: TaskId -> Handler RepJson
 getTaskSummaryR tid' = do
+  checkTaskIdPermission tid'
   taskInfo <- getTaskInfo tid'
   jsonToRepJson $ taskInfo
 
@@ -211,6 +237,7 @@ getSummaryR = do
     Nothing -> invalidArgs ["tasks"]
     Just stasks -> do
       let taskIds = map (Key . PersistText) $ T.splitOn "-" stasks
+      mapM_ checkTaskIdPermission taskIds
       taskInfos <- mapM getTaskInfo taskIds
       let total = sum $ map taskTotalTime taskInfos
           json = object \

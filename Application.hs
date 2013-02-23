@@ -8,7 +8,6 @@ module Application
 import Import
 import Settings
 import Yesod.Auth
-import Yesod.Auth.HashDB
 import Yesod.Default.Config
 import Yesod.Default.Main
 import Yesod.Default.Handlers
@@ -47,7 +46,6 @@ makeFoundation conf = do
               Database.Persist.Store.loadConfig >>=
               Database.Persist.Store.applyEnv
     p <- Database.Persist.Store.createPoolConfig (dbconf :: Settings.PersistConfig)
-    Database.Persist.Store.runPool dbconf (runMigration migrateUsers) p
     Database.Persist.Store.runPool dbconf (runMigration migrateAll) p
     return $ App conf s p manager dbconf
 
