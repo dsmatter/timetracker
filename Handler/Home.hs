@@ -24,13 +24,13 @@ data TaskInfo = TaskInfo { tid :: TaskId, name :: Text, tags :: [Tag], sessions 
 instance ToJSON TaskInfo where
   toJSON info =
     object \
-    [
-      ("id", toJSON $ tid info)
+    [ ("id", toJSON $ tid info)
     , ("name", toJSON $ name info)
     , ("tags", toJSON $ map tagName $ tags info)
-    , ("sessions", toJSON $ partitionSessions $ sessions info)
+    , ("sessions", toJSON $ map addTotal $ sessions info)
     , ("total", toJSON $ showNominalDiffTime $ taskTotalTime info)
     ]
+      where addTotal s@(z1,z2) = ((z1,z2), showNominalDiffTime $ sessionDiff s)
 
 sessionCompare :: Session -> Session -> Ordering
 sessionCompare (a,_) (b,_) = compare (zonedTimeToUTC a) (zonedTimeToUTC b)
@@ -204,7 +204,7 @@ getTaskSummaryR tid' = do
   taskInfo <- getTaskInfo tid'
   jsonToRepJson $ taskInfo
 
-getSummaryR :: Handler RepJson
+getSummaryR :: Handler RepHtmlJson
 getSummaryR = do
   mtasks <- lookupGetParam "tasks"
   case mtasks of
@@ -212,4 +212,9 @@ getSummaryR = do
     Just stasks -> do
       let taskIds = map (Key . PersistText) $ T.splitOn "-" stasks
       taskInfos <- mapM getTaskInfo taskIds
-      jsonToRepJson taskInfos
+      let total = sum $ map taskTotalTime taskInfos
+          json = object \
+                  [ ("tasks" :: Text, toJSON taskInfos)
+                  , ("total" :: Text, toJSON $ showNominalDiffTime total)
+                  ]
+      defaultLayoutJson $(widgetFile "summary") json

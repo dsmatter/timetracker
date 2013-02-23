@@ -9,7 +9,7 @@ requirejs ["decorate", "tasks", "task", "createTask", "total", "search"],
     decorator.decorateOverview()
     search.attachTo "#searchbar"
     createTask.attachTo "#addtask"
-    total.attachTo "#totalval"
+    total.attachTo ".total"
     $(".task").each ->
       id = $(@).attr("id").replace "task-", ""
       task.attachTo $(@), taskId: id

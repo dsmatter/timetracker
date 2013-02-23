@@ -1,11 +1,20 @@
 define ->
 
   request: (method, path, data, callback) ->
+    timer = setTimeout (->
+      $(".overlay").show()
+    ),  100
     $.ajax path,
       type: method
       data: data
-      error: (xhr, status, error) -> callback (new Error status + " | " + error)
-      success: (data, status, xhr) -> callback null, data, status, xhr
+      error: (xhr, status, error) ->
+        clearTimeout timer
+        $(".overlay").hide()
+        callback (new Error status + " | " + error)
+      success: (data, status, xhr) ->
+        clearTimeout timer
+        $(".overlay").hide()
+        callback null, data, status, xhr
 
   get: (path, data, callback) ->
     @request "GET", path, data, callback

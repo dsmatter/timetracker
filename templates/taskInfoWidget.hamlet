@@ -9,7 +9,7 @@
           <div .started .hidden>#{show $ zonedTimeToMillies tstart}
           <div .running>(running)
         <div .tasktime>#{showNominalDiffTime $ taskTotalTime taskInfo}
-      <div .span1 .actions>
+      <div .span1 .actions .unactive>
         <div .edit>
           <i .icon-edit>
         <div .delete>

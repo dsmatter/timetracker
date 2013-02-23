@@ -9,9 +9,12 @@ define ['components/flight/lib/component', 'decorate'], (defineComponent, decora
       "#{sHours}:#{sMins}"
 
     @setTotal = (e, total) ->
-      $(@node).text (@secondsToDurationString total.secs)
+      @$node.find("#totalval").text (@secondsToDurationString total.secs)
 
     @after "initialize", ->
+      @$node.find(".summary").click =>
+        @trigger "#tasks", "getSummary"
+
       @on "setTotal", @setTotal
 
   defineComponent component

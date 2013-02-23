@@ -1,3 +1,5 @@
+<div .overlay>
+  <i .animate-spin .icon-spin>
 <div .row>
   <div .span6 .offset1>
     <h1> TimeTrackR
@@ -20,3 +22,5 @@
             <div .row>
               <div .span4> Total
               <div .span1 #totalval> (calculating...)
+              <div .span1 .summary .unactive>
+                <i .icon-summary>

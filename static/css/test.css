@@ -5,7 +5,11 @@
   padding: 50px 0px;
   background: #f3f3f3;
   box-shadow: 1px 1px 8px #555555;
-  }
+}
+
+.main.loading {
+  background: red;
+}
 
 h1 {
   text-align: center;
@@ -33,7 +37,7 @@ h1 {
 }
 
 .task.runningTask {
-  background: #ccffcc;
+  background: #e0f0e0;
 }
 
 .total {
@@ -73,6 +77,10 @@ footer {
   margin-left: 10px;
 }
 
+.unactive {
+  color: #e0e0e0;
+}
+
 .delete {
   display: inline-block;
 }
@@ -84,4 +92,43 @@ footer {
 
 .edit {
   display: inline-block;
+}
+
+table.summary td {
+  padding: 2px 7px;
+}
+
+div.summary {
+  color: #333333;
+}
+
+div.summary.unactive {
+  color: #e0e0e0;
+}
+
+div.summary.selected {
+  color: #990000;
+}
+
+.loading {
+  position: fixed;
+  left: 800px;
+  top: 500px;
+  display: none;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  font-size: 100px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.overlay i {
+  margin-top: 25%;
 }

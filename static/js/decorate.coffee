@@ -3,6 +3,7 @@ define ->
     @setupHoverFor($("body"))
     @setupTasksHover()
     @decorateRunning()
+    @setupTotalHover()
 
   setupTasksHover: ->
     self = @
@@ -10,11 +11,22 @@ define ->
       self.setupTaskHover $(@)
 
   setupTaskHover: (element) ->
-    element.find(".info").hover \
+    element.hover \
     (->
-      element.find(".sessions").removeClass("hidden")),
+      element.find(".actions").removeClass("unactive")),
     (->
+      element.find(".actions").addClass("unactive")
       element.find(".sessions").addClass("hidden"))
+
+    element.find(".info").mouseover ->
+      element.find(".sessions").removeClass("hidden")
+
+  setupTotalHover: ->
+    $(".total").hover \
+    (->
+      $(@).find(".summary").removeClass("unactive")),
+    (->
+      $(@).find(".summary").addClass("unactive")),
 
   setupHoverFor: (element) ->
     self = @
