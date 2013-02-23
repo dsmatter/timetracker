@@ -8,6 +8,7 @@ import Database.Persist.Query.Join
 --import Database.Persist.GenericSql.Raw
 import Data.List (sortBy, head)
 import Data.Time
+import Data.Time.Clock.POSIX
 import System.Locale
 import Data.Maybe
 import Text.Printf
@@ -39,6 +40,12 @@ formatToD = formatTime defaultTimeLocale "%H:%M"
 
 formatDate :: ZonedTime -> String
 formatDate = formatTime defaultTimeLocale "%Y-%m-%d"
+
+zonedTimeToMillies :: ZonedTime -> Int
+zonedTimeToMillies zt =
+  let secs = utcTimeToPOSIXSeconds $ zonedTimeToUTC zt
+      millies = secs * 1000
+  in round millies
 
 taskTagsText :: TaskInfo -> Text
 taskTagsText = T.unwords . map (T.append "@" . tagName) . tags
@@ -86,6 +93,11 @@ getTaskStart tid' = do
     mstart <- runDB $ selectFirst [TaskStartTask ==. tid'] []
     return $ fmap (taskStartStart . entityVal) mstart
 
+secondsSince :: ZonedTime -> IO NominalDiffTime
+secondsSince zt = do
+  now <- getZonedTime
+  return $ sessionDiff (now, zt)
+
 getTaskInfo :: TaskId -> Handler TaskInfo
 getTaskInfo tid' = do
     let logJoin = (selectOneMany (TaskLogTask <-.) taskLogTask) \
@@ -106,6 +118,11 @@ getTaskInfo tid' = do
 getAllTaskInfo :: Handler [TaskInfo]
 getAllTaskInfo = do
     runDB $ (selectKeys [] [] C.$= CL.mapM (lift . getTaskInfo)) C.$$ CL.consume
+
+getPartialTaskHtml :: TaskId -> Handler RepHtml
+getPartialTaskHtml tid' = do
+  taskInfo <- getTaskInfo tid'
+  hamletToRepHtml $(hamletFile "templates/taskInfoWidget.hamlet")
 
 getHomeR :: Handler RepHtml
 getHomeR = do
@@ -129,8 +146,7 @@ postAddTaskR = do
             tagIds <- mapM getTagId tags'
             setTaskTags taskId tagIds
             -- Return partial HTML
-            taskInfo <- getTaskInfo taskId
-            hamletToRepHtml $(hamletFile "templates/taskInfoWidget.hamlet")
+            getPartialTaskHtml taskId
 
 deleteTaskR :: TaskId -> Handler RepPlain
 deleteTaskR tid' = do
@@ -150,5 +166,22 @@ putTaskR tid' = do
       tagIds <- mapM getTagId tags'
       setTaskTags tid' tagIds
       -- Return partial HTML
-      taskInfo <- getTaskInfo tid'
-      hamletToRepHtml $(hamletFile "templates/taskInfoWidget.hamlet")
+      getPartialTaskHtml tid'
+
+postTaskStartR :: TaskId -> Handler RepHtml
+postTaskStartR tid' = do
+  now <- liftIO getZonedTime
+  _ <- runDB $ insert $ TaskStart tid' now
+  getPartialTaskHtml tid'
+
+postTaskStopR :: TaskId -> Handler RepHtml
+postTaskStopR tid' = do
+  now <- liftIO getZonedTime
+  mstart <- runDB $ getBy $ UniqueTaskStart tid'
+  case mstart of
+    Nothing -> invalidArgs ["not started"]
+    Just estart -> do
+      let startTime = taskStartStart $ entityVal estart
+      _ <- runDB $ insert $ TaskLog tid' startTime now
+      _ <- runDB $ delete $ entityKey estart
+      getPartialTaskHtml tid'

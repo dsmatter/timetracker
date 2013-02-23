@@ -8,8 +8,8 @@ requirejs ["decorate", "tasks", "task", "createTask", "total"],
     decorator.decorateOverview()
     createTask.attachTo "#addtask"
     total.attachTo "#totalval"
-    tasks.attachTo "#tasks"
     $(".task").each ->
       id = $(@).attr("id").replace "task-", ""
       task.attachTo $(@), taskId: id
+    tasks.attachTo "#tasks"
 

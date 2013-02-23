@@ -18,6 +18,7 @@ TaskLog
 TaskStart
     task TaskId
     start ZonedTime
+    UniqueTaskStart task
     deriving Show
 
 

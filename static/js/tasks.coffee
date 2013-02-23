@@ -3,10 +3,11 @@ define ['components/flight/lib/component', 'decorate', 'task'], (defineComponent
 
     @sumUpSessions = ->
       result = 0
-      $(".tasktime:visible").each ->
-        val = $(@).text().trim()
-        split = val.split ":"
-        result += 60 * ((Number) split[0]) + ((Number) split[1])
+      for selector in [".tasktime:visible", ".running:visible"]
+        $(selector).each ->
+          val = $(@).text().trim()
+          split = val.split ":"
+          result += 60 * ((Number) split[0]) + ((Number) split[1])
       result
 
     @addTask = (e, task) ->
@@ -19,9 +20,16 @@ define ['components/flight/lib/component', 'decorate', 'task'], (defineComponent
     @calculateTotal = ->
       @trigger $("#totalval"), "setTotal", secs: @sumUpSessions()
 
+    @replaceTask = (e, task) ->
+      element = @$node.find("#task-" + task.taskId)
+      decorator.decorateTask element
+      taskC.attachTo element, taskId: task.taskId
+      @trigger "totalChanged"
+
     @after "initialize", ->
       @calculateTotal()
       @on "totalChanged", @calculateTotal
       @on "newTask", @addTask
+      @on "replaceTask", @replaceTask
 
   defineComponent component
