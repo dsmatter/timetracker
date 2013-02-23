@@ -1,33 +1,17 @@
-define ['components/flight/lib/component'], (defineComponent) ->
-  totalComponent = ->
+define ['components/flight/lib/component', 'decorate'], (defineComponent, decorator) ->
+  component = ->
 
-    @sumUpSessionsNum = ->
-      result = 0
-      $(".tasktime").each ->
-        val = $(@).text().trim()
-        split = val.split ":"
-        result += 60 * ((Number) split[0]) + ((Number) split[1])
-      result
-
-    @sumUpSessions = ->
-      n = @sumUpSessionsNum()
+    @secondsToDurationString = (n) ->
       hours = parseInt(n / 60)
       mins = n % 60
       sHours = if hours < 10 then "0" + hours else hours.toString()
       sMins = if mins < 10 then "0" + mins else mins.toString()
       "#{sHours}:#{sMins}"
 
-    @addTotal = ->
-      template = '<div class="row"><div class="span6 total"><div class="row">' +
-        '<div class="span5">Total</div><div class="span1">' + @sumUpSessions() +
-        '</div></div></div></div>'
-      $(".task").last().parent().parent().append(template)
-
-    @calc = ->
-      alert "da"
-      @addTotal()
+    @setTotal = (e, total) ->
+      $(@node).text (@secondsToDurationString total.secs)
 
     @after "initialize", ->
-      @calc()
+      @on "setTotal", @setTotal
 
-  defineComponent totalComponent
+  defineComponent component

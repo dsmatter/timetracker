@@ -2,19 +2,21 @@
 module Handler.Home where
 
 import Import
-import Database.Persist.Store
+import Text.Hamlet (hamletFile)
+--import Database.Persist.Store
 import Database.Persist.Query.Join
-import Database.Persist.GenericSql.Raw
-import Data.List (sortBy)
+--import Database.Persist.GenericSql.Raw
+import Data.List (sortBy, head)
 import Data.Time
 import System.Locale
+import Data.Maybe
 import Text.Printf
 import qualified Data.Text as T
 import qualified Data.Conduit as C
 import qualified Data.Conduit.List as CL
 
 type Session = (ZonedTime,ZonedTime)
-data TaskInfo = TaskInfo { tid :: TaskId, name :: Text, tags :: [Tag], sessions :: [Session] }
+data TaskInfo = TaskInfo { tid :: TaskId, name :: Text, tags :: [Tag], sessions :: [Session], started :: Maybe ZonedTime }
 
 sessionCompare :: Session -> Session -> Ordering
 sessionCompare (a,_) (b,_) = compare (zonedTimeToUTC a) (zonedTimeToUTC b)
@@ -60,27 +62,51 @@ partitionSessions :: [Session] -> [(String,[Session])]
 partitionSessions = partitionBy h
     where h (a,_) = formatDate a
 
+extractTags :: Text -> (Text, [Tag])
+extractTags tname' =
+  let (n:t) = T.splitOn " @" tname'
+      tname = T.strip n
+      tags'  = map (Tag . T.strip) t
+  in (tname, tags')
+
+getTagId :: Tag -> Handler TagId
+getTagId tag' = do
+  mtag <- runDB $ selectFirst [TagName ==. tagName tag'] []
+  case mtag of
+    Just etag -> return $ entityKey etag
+    Nothing -> runDB $ insert tag'
+
+setTaskTags :: TaskId -> [TagId] -> Handler ()
+setTaskTags tid' tags' = do
+  runDB $ deleteWhere [TaskTagTask ==. tid']
+  mapM_ (runDB . insert . TaskTag tid') tags'
+
+getTaskStart :: TaskId -> Handler (Maybe ZonedTime)
+getTaskStart tid' = do
+    mstart <- runDB $ selectFirst [TaskStartTask ==. tid'] []
+    return $ fmap (taskStartStart . entityVal) mstart
+
+getTaskInfo :: TaskId -> Handler TaskInfo
+getTaskInfo tid' = do
+    let logJoin = (selectOneMany (TaskLogTask <-.) taskLogTask) \
+      { somIncludeNoMatch = True, somFilterOne = [TaskId ==. tid'] }
+    let tagJoin = (selectOneMany (TaskTagTask <-.) taskTagTask) \
+      { somIncludeNoMatch = True, somFilterOne = [TaskId ==. tid'] }
+    taskWithLog <- fmap head $ runDB $ runJoin logJoin
+    taskWithTags <- fmap head $ runDB $ runJoin tagJoin
+    mstart <- getTaskStart tid'
+    tags' <- getTags taskWithTags
+
+    return $ TaskInfo tid' (taskName $ getTask taskWithLog) tags' (getSessions taskWithLog) mstart
+      where getTask (etask,_) = entityVal etask
+            getTags (_,tts) = mapM (fmap fromJust . runDB . get . taskTagTag . entityVal) tts
+            getSessions (_,logs) = map (splitPair taskLogStart taskLogEnd . entityVal) logs
+            splitPair f g v = (f v, g v)
+
 getAllTaskInfo :: Handler [TaskInfo]
 getAllTaskInfo = do
-    let join = (selectOneMany (TaskLogTask <-.) taskLogTask) { somIncludeNoMatch = True }
-    tasksWithLog <- runDB $ runJoin join
-    let stmts = map getTagStmt tasksWithLog
-    tasksTagData <- fmap (map concat) $ mapM (\stmt -> runDB $ stmt C.$$ CL.consume) stmts
-    let tasksTags = map (map (\(PersistText t) -> Tag t)) tasksTagData
-    let taskInfoData = zipWith (\(et,els) tgs -> (et,tgs,els)) tasksWithLog tasksTags
-    return $ map (\(etask,tgs,elogs) -> TaskInfo (entityKey etask) (getName etask) tgs (getSessions elogs)) taskInfoData
-        where getName = taskName . entityVal
-              getSessions = sortBy sessionCompare . map ((splitPair taskLogStart taskLogEnd) . entityVal)
-              splitPair f g v = (f v, g v)
-              getTagStmt (et,_) = withStmt "SELECT t.name FROM task_tag tt, tag t WHERE tt.tag = t.id AND tt.task = ?" [unKey (entityKey et)]
+    runDB $ (selectKeys [] [] C.$= CL.mapM (lift . getTaskInfo)) C.$$ CL.consume
 
--- This is a handler function for the GET request method on the HomeR
--- resource pattern. All of your resource patterns are defined in
--- config/routes
---
--- The majority of the code you will write in Yesod lives in these handler
--- functions. You can spread them across multiple files if you are so
--- inclined, or create a single monolithic file.
 getHomeR :: Handler RepHtml
 getHomeR = do
     defaultLayout $ do
@@ -96,13 +122,33 @@ postAddTaskR = do
     case mTaskName of
         Nothing -> invalidArgs ["name"]
         Just taskName' -> do
-            taskId <- runDB $ insert $ Task taskName'
-            -- FIXME: no surrounding layout
-            defaultLayout $ do
-                let taskInfo = TaskInfo taskId taskName' [] []
-                $(widgetFile "taskInfoWidget")
+            -- Insert the new task
+            let (name', tags') = extractTags taskName'
+            taskId <- runDB $ insert $ Task name'
+            -- Set the associated tags
+            tagIds <- mapM getTagId tags'
+            setTaskTags taskId tagIds
+            -- Return partial HTML
+            taskInfo <- getTaskInfo taskId
+            hamletToRepHtml $(hamletFile "templates/taskInfoWidget.hamlet")
 
 deleteTaskR :: TaskId -> Handler RepPlain
 deleteTaskR tid' = do
     runDB $ delete tid'
     return $ RepPlain "deleted"
+
+putTaskR :: TaskId -> Handler RepHtml
+putTaskR tid' = do
+  mTaskName <- lookupPostParam "name"
+  case mTaskName of
+    Nothing -> invalidArgs ["name"]
+    Just tname -> do
+      -- Change the task name
+      let (name', tags') = extractTags tname
+      runDB $ update tid' [TaskName =. name']
+      -- Change the associated tags
+      tagIds <- mapM getTagId tags'
+      setTaskTags tid' tagIds
+      -- Return partial HTML
+      taskInfo <- getTaskInfo tid'
+      hamletToRepHtml $(hamletFile "templates/taskInfoWidget.hamlet")

@@ -15,3 +15,8 @@
         <div #tasks>
           $forall w <- taskInfoWidgets
             ^{w}
+        <div .row>
+          <div .span6 .total>
+            <div .row>
+              <div .span4> Total
+              <div .span1 #totalval> (calculating...)

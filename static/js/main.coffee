@@ -2,8 +2,14 @@
 requirejs.config
   urlArgs: "bust=" + (new Date()).getTime()
 
-requirejs ["decorate", "total"], (decorator, total) ->
+requirejs ["decorate", "tasks", "task", "createTask", "total"],
+(decorator, tasks, task, createTask, total) ->
   $("document").ready ->
     decorator.decorateOverview()
-    total.attachTo(".task:first")
+    createTask.attachTo "#addtask"
+    total.attachTo "#totalval"
+    tasks.attachTo "#tasks"
+    $(".task").each ->
+      id = $(@).attr("id").replace "task-", ""
+      task.attachTo $(@), taskId: id
 

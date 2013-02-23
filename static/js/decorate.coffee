@@ -1,20 +1,22 @@
 define ->
   decorateOverview: ->
-    @setupHover()
+    @setupHoverFor($("body"))
+    @setupTasksHover()
 
-  setupHover: ->
+  setupTasksHover: ->
     $(".task").hover \
     (->
-      $(@).addClass "selected"
       $(@).find(".sessions").removeClass("hidden")),
     (->
-      $(@).removeClass "selected"
-      $(@).find(".sessions").addClass("hidden")
-    )
-    $(".total").hover \
+      $(@).find(".sessions").addClass("hidden"))
+
+  setupHoverFor: (element) ->
+    self = @
+    element.hover \
     (->
       $(@).addClass "selected"),
     (->
-      $(@).removeClass "selected"
-    )
+      $(@).removeClass "selected")
+    element.children().each ->
+      self.setupHoverFor $(@)
 

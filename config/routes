@@ -6,4 +6,4 @@
 
 / HomeR GET
 /tasks AddTaskR POST
-/tasks/#TaskId TaskR DELETE
+/tasks/#TaskId TaskR DELETE PUT
