@@ -86,6 +86,7 @@ instance Yesod App where
             --addScript $ StaticR components_es5_shim_es5_sham_js
             $(widgetFile "bootstrap")
             $(widgetFile "default-layout")
+            addStylesheet $ StaticR css_icons_css
             addStylesheet $ StaticR css_test_css
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
 

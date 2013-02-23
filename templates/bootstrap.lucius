@@ -1388,6 +1388,7 @@ table .span24 {
   width: 1884px;
   margin-left: 0;
 }
+/* Disable icons
 [class^="icon-"],
 [class*=" icon-"] {
   display: inline-block;
@@ -1767,6 +1768,7 @@ table .span24 {
 .icon-resize-horizontal {
   background-position: -456px -118px;
 }
+*/
 .dropdown {
   position: relative;
 }
