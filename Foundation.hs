@@ -82,12 +82,10 @@ instance Yesod App where
 
         pc <- widgetToPageContent $ do
             addScript $ StaticR js_components_jquery_jquery_js
-            --addScript $ StaticR components_es5_shim_es5_shim_js
-            --addScript $ StaticR components_es5_shim_es5_sham_js
             $(widgetFile "bootstrap")
+            $(widgetFile "icons")
+            $(widgetFile "style")
             $(widgetFile "default-layout")
-            addStylesheet $ StaticR css_icons_css
-            addStylesheet $ StaticR css_test_css
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
 
     -- This is done to provide an optimization for serving static files from
