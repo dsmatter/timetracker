@@ -12,6 +12,8 @@ import Data.Time.Clock.POSIX
 import System.Locale
 import Data.Maybe
 import Text.Printf
+import Data.Aeson (ToJSON)
+import Database.Persist.Store
 import qualified Data.Text as T
 import qualified Data.Conduit as C
 import qualified Data.Conduit.List as CL
@@ -19,13 +21,24 @@ import qualified Data.Conduit.List as CL
 type Session = (ZonedTime,ZonedTime)
 data TaskInfo = TaskInfo { tid :: TaskId, name :: Text, tags :: [Tag], sessions :: [Session], started :: Maybe ZonedTime }
 
+instance ToJSON TaskInfo where
+  toJSON info =
+    object \
+    [
+      ("id", toJSON $ tid info)
+    , ("name", toJSON $ name info)
+    , ("tags", toJSON $ map tagName $ tags info)
+    , ("sessions", toJSON $ partitionSessions $ sessions info)
+    , ("total", toJSON $ showNominalDiffTime $ taskTotalTime info)
+    ]
+
 sessionCompare :: Session -> Session -> Ordering
 sessionCompare (a,_) (b,_) = compare (zonedTimeToUTC a) (zonedTimeToUTC b)
 
 showNominalDiffTime :: NominalDiffTime -> String
 showNominalDiffTime dt =
     let totalMins = dt / 60
-        hours = round $ totalMins / 60 :: Int
+        hours = floor $ totalMins / 60 :: Int
         mins = mod (round totalMins) 60 :: Int
     in printf "%02d:%02d" hours mins
 
@@ -185,3 +198,18 @@ postTaskStopR tid' = do
       _ <- runDB $ insert $ TaskLog tid' startTime now
       _ <- runDB $ delete $ entityKey estart
       getPartialTaskHtml tid'
+
+getTaskSummaryR :: TaskId -> Handler RepJson
+getTaskSummaryR tid' = do
+  taskInfo <- getTaskInfo tid'
+  jsonToRepJson $ taskInfo
+
+getSummaryR :: Handler RepJson
+getSummaryR = do
+  mtasks <- lookupGetParam "tasks"
+  case mtasks of
+    Nothing -> invalidArgs ["tasks"]
+    Just stasks -> do
+      let taskIds = map (Key . PersistText) $ T.splitOn "-" stasks
+      taskInfos <- mapM getTaskInfo taskIds
+      jsonToRepJson taskInfos

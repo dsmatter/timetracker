@@ -71,6 +71,7 @@ library
                  , time
                  , conduit
                  , old-locale
+                 , yesod-json
 
 executable         timetracker
     if flag(library-only)
