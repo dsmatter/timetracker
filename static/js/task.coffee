@@ -20,6 +20,7 @@ define ['components/flight/lib/component', 'ajax', 'time', 'session'],
         return result
 
     @enterEditMode = ->
+      @$node.find(".tags").hide()
       nameElement = @$node.find ".taskname"
       oldName = @nameWithTags()
       nameElement.html('<input type="text" value="' + oldName + '" />')
