@@ -24,6 +24,12 @@ define ->
       unless element.find(".expand").hasClass("active")
         element.find(".sessions").addClass("hidden"))
 
+    element.find(".info").hover \
+    (->
+      element.find(".expand").addClass("start")),
+    (->
+      element.find(".expand").removeClass("start")),
+
   setupTotalHover: ->
     $(".total").hover \
     (->

@@ -51,12 +51,13 @@ h2 {
   height: 100%;
 }
 
+.expand.active,
 .expand.selected {
-  color: #990000;
+  color: #333333;
 }
 
-.expand.active {
-  color: #333333;
+.expand.start {
+  color: green;
 }
 
 .hidden {
@@ -153,5 +154,5 @@ div.summary.selected {
 #login {
   padding: 20px;
   margin-left: 40px;
-  margin-top: 40px;
+  margin-top:   40px;
 }
