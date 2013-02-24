@@ -15,11 +15,14 @@ define ->
     (->
       element.find(".actions").removeClass("unactive")),
     (->
-      element.find(".actions").addClass("unactive")
-      element.find(".sessions").addClass("hidden"))
+      element.find(".actions").addClass("unactive"))
 
-    element.find(".info").mouseover ->
-      element.find(".sessions").removeClass("hidden")
+    element.find(".expand").hover \
+    (->
+      element.find(".sessions").removeClass("hidden")),
+    (->
+      unless element.find(".expand").hasClass("active")
+        element.find(".sessions").addClass("hidden"))
 
   setupTotalHover: ->
     $(".total").hover \

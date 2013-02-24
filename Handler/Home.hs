@@ -19,7 +19,7 @@ import qualified Data.Text as T
 import qualified Data.Conduit as C
 import qualified Data.Conduit.List as CL
 
-type Session = (ZonedTime,ZonedTime)
+type Session = (TaskLogId,ZonedTime,ZonedTime)
 data TaskInfo = TaskInfo { tid :: TaskId, name :: Text, tags :: [Tag], sessions :: [Session], started :: Maybe ZonedTime }
 
 instance ToJSON TaskInfo where
@@ -31,10 +31,10 @@ instance ToJSON TaskInfo where
     , ("sessions", toJSON $ map addTotal $ sessions info)
     , ("total", toJSON $ showNominalDiffTime $ taskTotalTime info)
     ]
-      where addTotal s@(z1,z2) = ((z1,z2), showNominalDiffTime $ sessionDiff s)
+      where addTotal s@(_,z1,z2) = ((z1,z2), showNominalDiffTime $ sessionDiff s)
 
 sessionCompare :: Session -> Session -> Ordering
-sessionCompare (a,_) (b,_) = compare (zonedTimeToUTC a) (zonedTimeToUTC b)
+sessionCompare (_,a,_) (_,b,_) = compare (zonedTimeToUTC a) (zonedTimeToUTC b)
 
 showNominalDiffTime :: NominalDiffTime -> String
 showNominalDiffTime dt =
@@ -44,7 +44,7 @@ showNominalDiffTime dt =
     in printf "%02d:%02d" hours mins
 
 sessionDiff :: Session -> NominalDiffTime
-sessionDiff (s,e) = diffUTCTime (zonedTimeToUTC e) (zonedTimeToUTC s)
+sessionDiff (_,s,e) = diffUTCTime (zonedTimeToUTC e) (zonedTimeToUTC s)
 
 taskTotalTime :: TaskInfo -> NominalDiffTime
 taskTotalTime = sum . map sessionDiff . sessions
@@ -81,7 +81,7 @@ partitionBy f = reduce' . sortBy cmp' . map map'
 
 partitionSessions :: [Session] -> [(String,[Session])]
 partitionSessions = partitionBy h
-    where h (a,_) = formatDate a
+    where h (_,a,_) = formatDate a
 
 extractTags :: Text -> (Text, [Tag])
 extractTags tname' =
@@ -110,7 +110,7 @@ getTaskStart tid' = do
 secondsSince :: ZonedTime -> IO NominalDiffTime
 secondsSince zt = do
   now <- getZonedTime
-  return $ sessionDiff (now, zt)
+  return $ sessionDiff (undefined, now, zt)
 
 getUser :: Handler UserId
 getUser = do
@@ -145,8 +145,8 @@ getTaskInfo tid' = do
     return $ TaskInfo tid' (taskName $ getTask taskWithLog) tags' (getSessions taskWithLog) mstart
       where getTask (etask,_) = entityVal etask
             getTags (_,tts) = mapM (fmap fromJust . runDB . get . taskTagTag . entityVal) tts
-            getSessions (_,logs) = map (splitPair taskLogStart taskLogEnd . entityVal) logs
-            splitPair f g v = (f v, g v)
+            getSessions (_,logs) = map h logs
+            h l = (entityKey l, taskLogStart (entityVal l), taskLogEnd (entityVal l))
 
 getAllTaskInfo :: Handler [TaskInfo]
 getAllTaskInfo = do
@@ -245,3 +245,10 @@ getSummaryR = do
                   , ("total" :: Text, toJSON $ showNominalDiffTime total)
                   ]
       defaultLayoutJson $(widgetFile "summary") json
+
+deleteSessionR :: TaskLogId -> Handler RepHtml
+deleteSessionR tlid = do
+  session <- runDB $ fmap fromJust $ get tlid
+  checkTaskIdPermission $ taskLogTask session
+  _ <- runDB $ delete tlid
+  getPartialTaskHtml $ taskLogTask session

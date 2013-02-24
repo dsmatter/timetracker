@@ -1,9 +1,12 @@
 <div .row>
   <div .span6 .task id="task-#{showKey $ tid taskInfo}">
     <div .row>
-      <div .span4 .info>
-        <div .taskname>#{name taskInfo}
-        <div .tags>#{taskTagsText taskInfo}
+      <div .span4>
+        <div .expand .unactive>
+          <i .icon-play>
+        <div .info>
+          <div .taskname>#{name taskInfo}
+          <div .tags>#{taskTagsText taskInfo}
       <div .span1 .time>
         $maybe tstart <- started taskInfo
           <div .started .hidden>#{show $ zonedTimeToMillies tstart}
@@ -19,11 +22,10 @@
         <div .sessions .hidden>
           $forall (date, sess) <- partitionSessions $ sessions taskInfo
             <div .date> ‣ #{date}
-              $forall (start, end) <- sess
+              $forall (sid,  start, end) <- sess
                 <table .times>
-                  <tr>
-                    <td> •
+                  <tr id="session-#{showKey sid}">
                     <td> #{formatToD start}
                     <td> -
                     <td> #{formatToD end}
-                    <td> (#{showNominalDiffTime $ sessionDiff (start, end)})
+                    <td> (#{showNominalDiffTime $ sessionDiff (sid, start, end)})

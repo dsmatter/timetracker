@@ -1,4 +1,5 @@
-define ['components/flight/lib/component', 'ajax', 'time'], (defineComponent, ajax, time) ->
+define ['components/flight/lib/component', 'ajax', 'time', 'session'],
+(defineComponent, ajax, time, session) ->
   component = ->
 
     @delete = ->
@@ -58,10 +59,10 @@ define ['components/flight/lib/component', 'ajax', 'time'], (defineComponent, aj
         if err?
           alert err
           return
-        newElement = $(data).find ".task"
-        @$node.replaceWith newElement
-        @teardown()
-        @trigger "#tasks", "replaceTask", taskId: @attr.taskId
+        @trigger (@$node.find ".times tr"), "sessionTearDown"
+        @trigger "replaceTask",
+          taskId: @attr.taskId
+          element: $(data)
 
     @start = ->
       @taskCmd "start"
@@ -69,7 +70,17 @@ define ['components/flight/lib/component', 'ajax', 'time'], (defineComponent, aj
     @stop = ->
       @taskCmd "stop"
 
+    @toggleExpand = ->
+      expand = @$node.find ".expand"
+      sessions = @$node.find ".sessions"
+      if expand.hasClass "active"
+        sessions.addClass "hidden"
+      else
+        sessions.removeClass "hidden"
+      @$node.find(".expand").toggleClass("active").show()
+
     @after "initialize", ->
+      self = @
       @$node.find(".delete").click =>
         if confirm "Delete task '" + @$node.find(".taskname").text() + "'?"
           @trigger "delete"
@@ -83,6 +94,15 @@ define ['components/flight/lib/component', 'ajax', 'time'], (defineComponent, aj
         else
           @trigger "start"
 
+      @$node.find(".expand").click =>
+        @trigger "toggleExpand"
+
+      @$node.find(".times tr").each ->
+        id = $(@).attr("id").replace "session-", ""
+        session.attachTo $(@),
+          sessionId: id
+          taskId: self.attr.taskId
+
       if @$node.find(".started").length > 0
         @setupStarted()
 
@@ -90,5 +110,7 @@ define ['components/flight/lib/component', 'ajax', 'time'], (defineComponent, aj
       @on "edit", @enterEditMode
       @on "start", @start
       @on "stop", @stop
+      @on "toggleExpand", @toggleExpand
+      @on "replaceTask", -> @teardown()
 
   defineComponent component

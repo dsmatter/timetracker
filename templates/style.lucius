@@ -7,13 +7,13 @@
   box-shadow: 1px 1px 8px #555555;
 }
 
-.main.loading {
-  background: red;
-}
-
 h1 {
   text-align: center;
   padding: 10px;
+}
+
+h2 {
+  padding: 5px;
 }
 
 #searchbar input {
@@ -48,7 +48,15 @@ h1 {
   padding: 0px 10px;
   float: left;
   font-weight: bold;
-  height: 50px;
+  height: 100%;
+}
+
+.expand.selected {
+  color: #990000;
+}
+
+.expand.active {
+  color: #333333;
 }
 
 .hidden {
@@ -69,12 +77,17 @@ footer {
 }
 
 .sessions {
-  margin-left: 10px;
+  margin-top: 6px;
+  margin-left: 50px;
   font-size: 14px;
 }
 
 .times {
-  margin-left: 10px;
+  margin-left: 15px;
+}
+
+.times tr.selected {
+  color: #aa0000;
 }
 
 .unactive {
@@ -131,4 +144,8 @@ div.summary.selected {
 
 .overlay i {
   margin-top: 25%;
+}
+
+.transparent {
+  color: rgba(255,255,255,0)
 }

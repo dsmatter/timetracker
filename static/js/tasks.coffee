@@ -22,9 +22,16 @@ define ['components/flight/lib/component', 'decorate', 'task'], (defineComponent
 
     @replaceTask = (e, task) ->
       element = @$node.find("#task-" + task.taskId)
-      decorator.decorateTask element
-      taskC.attachTo element, taskId: task.taskId
+      expanded = element.find(".expand").hasClass "active"
+      newElement = if task.element.hasClass ".task"
+                     task.element
+                   else
+                     task.element.find ".task"
+      element.replaceWith newElement
+      decorator.decorateTask newElement
+      taskC.attachTo newElement, taskId: task.taskId
       @trigger "totalChanged"
+      @trigger newElement, "toggleExpand" if expanded
 
     @getSummary = ->
       query = ""
