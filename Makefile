@@ -16,9 +16,13 @@ package: dist/build/timetracker/timetracker
 	rm -rf $(TEMPDIR)
 	rm static/js/main.built.js
 
+clean:
+	cabal clean
+
 dist/build/timetracker/timetracker:
 	sed -i -e "s/main\\.js/main.built.js/" templates/default-layout-wrapper.hamlet
 	cabal clean
 	cabal configure
 	cabal build
 	sed -i -e "s/main\\.built\\.js/main.js/" templates/default-layout-wrapper.hamlet
+
