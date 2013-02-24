@@ -149,3 +149,9 @@ div.summary.selected {
 .transparent {
   color: rgba(255,255,255,0)
 }
+
+#login {
+  padding: 20px;
+  margin-left: 40px;
+  margin-top: 40px;
+}
