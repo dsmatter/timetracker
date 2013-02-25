@@ -69,7 +69,7 @@ task :pack_init => [:build_execuatable, :build_env, :build_coffee, :build_rjs,
                     :cleanup_assets, :pack, :cleanup_tmp_dir]
 
 task :pack_update => [:build_execuatable, :build_env, :build_coffee, :build_rjs,
-                      :cleanup_assets, :pack, :cleanup_tmp_dir]
+                      :cleanup_assets, :cleanup_config, :pack, :cleanup_tmp_dir]
 
 task :pack_update_nobuild => [:build_env, :build_coffee, :build_rjs,
                               :cleanup_assets, :cleanup_config, :pack,
