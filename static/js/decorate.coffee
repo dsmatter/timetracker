@@ -33,9 +33,9 @@ define ->
   setupTotalHover: ->
     $(".total").hover \
     (->
-      $(@).find(".summary").removeClass("unactive")),
+      $(@).find(".actions").removeClass("unactive")),
     (->
-      $(@).find(".summary").addClass("unactive")),
+      $(@).find(".actions").addClass("unactive")),
 
   setupHoverFor: (element) ->
     self = @

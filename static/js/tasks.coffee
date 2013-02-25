@@ -33,13 +33,23 @@ define ['components/flight/lib/component', 'decorate', 'task'], (defineComponent
       @trigger "totalChanged"
       @trigger newElement, "toggleExpand" if expanded
 
-    @getSummary = ->
+    @summaryUrl = ->
       query = ""
       $(".task:visible").each ->
         id = $(@).attr("id").replace("task-", "")
         query += "-#{id}"
       query = query.substring 1
-      window.location = "/summary?tasks=#{query}"
+      "/summary?tasks=#{query}"
+
+    @getSummary = ->
+      window.location = @summaryUrl()
+
+    @getSummaryJson = ->
+      url = @summaryUrl()
+      $.ajax url,
+        dataType: "json"
+        success: (data) ->
+          window.prompt "Copy that:", JSON.stringify(data)
 
     @after "initialize", ->
       @calculateTotal()
@@ -47,5 +57,6 @@ define ['components/flight/lib/component', 'decorate', 'task'], (defineComponent
       @on "newTask", @addTask
       @on "replaceTask", @replaceTask
       @on "getSummary", @getSummary
+      @on "getSummaryJson", @getSummaryJson
 
   defineComponent component

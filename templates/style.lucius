@@ -95,16 +95,17 @@ footer {
   color: #e0e0e0;
 }
 
-.delete {
-  display: inline-block;
-}
-
 .delete.selected,
+.summary.selected,
+.summary-json.selected,
 .edit.selected {
   color: #990000;
 }
 
-.edit {
+.edit,
+.delete,
+.summary,
+.summary-json {
   display: inline-block;
 }
 
@@ -112,15 +113,16 @@ table.summary td {
   padding: 2px 7px;
 }
 
-div.summary {
+.total .actions {
   color: #333333;
 }
 
-div.summary.unactive {
+.total .actions.unactive {
   color: #e0e0e0;
 }
 
-div.summary.selected {
+div.summary.selected,
+div.summary-json.selected {
   color: #990000;
 }
 

@@ -14,6 +14,8 @@ define ['components/flight/lib/component', 'decorate'], (defineComponent, decora
     @after "initialize", ->
       @$node.find(".summary").click =>
         @trigger "#tasks", "getSummary"
+      @$node.find(".summary-json").click =>
+        @trigger "#tasks", "getSummaryJson"
 
       @on "setTotal", @setTotal
 

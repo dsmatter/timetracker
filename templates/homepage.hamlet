@@ -25,5 +25,8 @@
                   <i .icon-play .transparent>
                 <div>Total
               <div .span1 #totalval> (calculating...)
-              <div .span1 .summary .unactive>
-                <i .icon-summary>
+              <div .span1 .actions .unactive>
+                <div .summary>
+                  <i .icon-summary>
+                <div .summary-json>
+                  <i .icon-share>
