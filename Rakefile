@@ -49,7 +49,7 @@ task :cleanup_assets do
   preserve = [
     "main.built.js",
     "jquery.min.js",
-    "require.js"
+    "require.min.js"
   ]
   FileUtils.rm_rf(to_delete)
   js_lint = Dir["static/js/*"].reject { |f| preserve.include? File.basename(f) }
@@ -72,4 +72,5 @@ task :pack_update => [:build_execuatable, :build_env, :build_coffee, :build_rjs,
                       :cleanup_assets, :pack, :cleanup_tmp_dir]
 
 task :pack_update_nobuild => [:build_env, :build_coffee, :build_rjs,
-                              :cleanup_assets, :pack, :cleanup_tmp_dir]
+                              :cleanup_assets, :cleanup_config, :pack,
+                              :cleanup_tmp_dir]
