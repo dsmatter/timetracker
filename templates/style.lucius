@@ -8,8 +8,11 @@
 }
 
 h1 {
+  font-size: 36px;
+  color: #444444;
   text-align: center;
-  padding: 10px;
+  padding: 20px;
+  margin-bottom: 15px;
 }
 
 h2 {
@@ -73,7 +76,7 @@ footer {
   margin-left: auto;
   margin-right: auto;
   width: 400px;
-  color: #d0d0d0;
+  color: #e9e9e9;
   text-align: center;
 }
 
