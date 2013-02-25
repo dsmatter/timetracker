@@ -24,6 +24,7 @@ task :build_coffee do
 end
 
 task :build_rjs do
+  sh "uglifyjs static/js/components/requirejs/require.js > static/js/require.min.js"
   sh "r.js -o build.js out=static/js/main.built.js"
 end
 
