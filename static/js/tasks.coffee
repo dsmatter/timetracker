@@ -14,7 +14,7 @@ define ['components/flight/lib/component', 'decorate', 'task'], (defineComponent
       @$node.append task.html
       taskId = $(task.html).find(".task").attr("id").replace "task-", ""
       taskElement = $("#task-" + taskId)
-      decorator.setupHoverFor taskElement
+      decorator.decorateTask taskElement
       taskC.attachTo taskElement, taskId: taskId
 
     @calculateTotal = ->
