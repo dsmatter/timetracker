@@ -5,12 +5,22 @@ original_dir = Dir.pwd
 
 task :default => :pack_update
 
+task :fetch_components do
+  dir = Dir.pwd
+  Dir.chdir("static/js")
+  sh "bower install"
+  sh "ln -s components/jquery/jquery.min.js ."
+  Dir.chdir(dir)
+end
+
 task :build_execuatable do
+  sh "touch static/js/jquery.min.js"
   sh 'sed -i -e "s/main\\.js/main.built.js/" templates/default-layout-wrapper.hamlet'
   sh "cabal clean"
   sh "cabal configure"
   sh "cabal build"
   sh 'sed -i -e "s/main\\.built\\.js/main.js/" templates/default-layout-wrapper.hamlet'
+  sh "rm static/js/jquery.min.js"
 end
 
 task :build_env do
@@ -23,7 +33,7 @@ task :build_coffee do
   sh "coffee -c static/js"
 end
 
-task :build_rjs do
+task :build_rjs => :fetch_components do
   sh "uglifyjs static/js/components/requirejs/require.js > static/js/require.min.js"
   sh "r.js -o build.js out=static/js/main.built.js"
 end
