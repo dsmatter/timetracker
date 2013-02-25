@@ -186,6 +186,10 @@ postAddTaskR = do
 deleteTaskR :: TaskId -> Handler RepPlain
 deleteTaskR tid' = do
   checkTaskIdPermission tid'
+  -- Manual "on delete cascade"
+  runDB $ deleteWhere [TaskTagTask ==. tid']
+  runDB $ deleteWhere [TaskLogTask ==. tid']
+  runDB $ deleteWhere [TaskStartTask ==. tid']
   runDB $ delete tid'
   return $ RepPlain "deleted"
 
