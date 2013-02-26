@@ -9,7 +9,7 @@ task :fetch_components do
   dir = Dir.pwd
   Dir.chdir("static/js")
   sh "bower install"
-  sh "ln -s components/jquery/jquery.min.js ."
+  sh "cp components/jquery/jquery.min.js ."
   Dir.chdir(dir)
 end
 
