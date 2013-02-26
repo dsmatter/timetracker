@@ -2,13 +2,13 @@
   <div .span6 .offset1>
     <table .summary>
       $forall taskInfo <- taskInfos
-        $forall (tid, start, end) <- sessions taskInfo
+        $forall (tid', start, end) <- sessions taskInfo
           <tr>
             <td>#{formatDate start}
             <td>#{formatToD start}
             <td>-
             <td>#{formatToD end}
-            <td .totaltime>(#{showNominalDiffTime $ sessionDiff (tid, start, end)})
+            <td .totaltime>(#{showNominalDiffTime $ sessionDiff (tid', start, end)})
       <tr>
         <td>
         <td>

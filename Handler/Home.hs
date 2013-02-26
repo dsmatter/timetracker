@@ -28,10 +28,12 @@ instance ToJSON TaskInfo where
     [ ("id", toJSON $ tid info)
     , ("name", toJSON $ name info)
     , ("tags", toJSON $ map tagName $ tags info)
-    , ("sessions", toJSON $ map addTotal $ sessions info)
+    , ("sessions", toJSON $ map toSessionObject $ sessions info)
     , ("total", toJSON $ showNominalDiffTime $ taskTotalTime info)
     ]
-      where addTotal s@(_,z1,z2) = ((z1,z2), showNominalDiffTime $ sessionDiff s)
+      where toSessionObject s@(_,from,to) = object $
+              [("from", toJSON from), ("to", toJSON to),
+               ("duration", toJSON $ showNominalDiffTime $ sessionDiff s)]
 
 sessionCompare :: Session -> Session -> Ordering
 sessionCompare (_,a,_) (_,b,_) = compare (zonedTimeToUTC a) (zonedTimeToUTC b)
