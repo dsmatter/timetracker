@@ -2,11 +2,15 @@
   <div .span6 .task id="task-#{showKey $ tid taskInfo}">
     <div .row>
       <div .span4>
-        <div .expand .unactive>
-          <i .icon-play>
-        <div .info>
-          <div .taskname>#{name taskInfo}
-          <div .tags>#{taskTagsText taskInfo}
+        <table .tasktable>
+          <tr>
+            <td>
+              <div .expand .unactive>
+                <i .icon-play>
+            <td>
+              <div .info>
+                <div .taskname>#{name taskInfo}
+                <div .tags>#{taskTagsText taskInfo}
       <div .span1 .time>
         $maybe tstart <- started taskInfo
           <div .started .hidden>#{show $ zonedTimeToMillies tstart}

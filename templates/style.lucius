@@ -27,6 +27,10 @@ h2 {
   width: 100%;
 }
 
+.tasktable {
+  margin-left: -10px;
+}
+
 .task,
 .total {
   padding: 10px;
