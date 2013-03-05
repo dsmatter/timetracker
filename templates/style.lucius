@@ -1,22 +1,37 @@
 @charset 'UTF-8';
 
+body {
+  background: #fdfdfd;
+}
+
 .main {
   margin-top: 20px;
   padding: 50px 0px;
-  background: #f3f3f3;
-  box-shadow: 1px 1px 8px #555555;
+  background: #f8f8f8;
+  border: 1px solid #e0e0e0;
+  box-shadow: 1px 1px 18px #555555;
+  color: #222222;
+}
+
+label {
+  clear: both;
+  color: #999999;
 }
 
 h1 {
-  font-size: 36px;
-  color: #444444;
+  font-family: Georgia;
+  font-size: 42px;
+  color: #aa0000;
   text-align: center;
   padding: 20px;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
+  padding-bottom: 30px;
 }
 
 h2 {
   padding: 5px;
+  margin-top: 20px;
+  color: #555;
 }
 
 #searchbar input {
@@ -38,13 +53,41 @@ h2 {
   cursor: default;
 }
 
+.hline {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: 30px;
+  border-top: 1px solid #bbb;
+}
+
+.hline.red {
+  border-top: 1px solid #a00;
+}
+
 .task.selected,
 .total.selected {
   background: #e9e9e9;
 }
 
 .task.runningTask {
-  background: #e0f0e0;
+  //border: 1px solid #a00;
+  background: #ecc;
+  //color: #f0f0f0;
+  border-left: 3px solid #a00;
+  margin-left: 17px;
+}
+
+.task.runningTask .actions.unactive,
+.task.runningTask .expand.unactive {
+  color: #fee;
+}
+
+.task.runningTask .expand.start {
+  color: #a00;
+}
+
+.running {
+  color: #a00;
 }
 
 .total {
@@ -64,7 +107,7 @@ h2 {
 }
 
 .expand.start {
-  color: green;
+  color: #a00;
 }
 
 .hidden {
@@ -164,4 +207,8 @@ div.summary-json.selected {
   padding: 20px;
   margin-left: 40px;
   margin-top:   40px;
+}
+
+.logo {
+  float: left;
 }

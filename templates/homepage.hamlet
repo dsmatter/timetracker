@@ -2,6 +2,8 @@
   <i .animate-spin .icon-spin>
 <div .row>
   <div .span6 .offset1>
+    <h1 .logo>
+      <i .icon-stopwatch>
     <h1> TimeTrackR
     <div #searchbar>
       <label for="search"> Search
@@ -13,10 +15,14 @@
       <div .span6>
         <h2> Tasks
     <div .row>
+      <div .span6 .hline>
+    <div .row>
       <div .span6>
         <div #tasks>
           $forall w <- taskInfoWidgets
             ^{w}
+        <div .row>
+          <div .span6 .hline .red>
         <div .row>
           <div .span6 .total>
             <div .row>
