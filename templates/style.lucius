@@ -199,6 +199,23 @@ div.summary-json.selected {
   margin-top: 25%;
 }
 
+.copybox {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.copybox textarea {
+  margin-top: 5%;
+  width: 80%;
+  height: 80%;
+}
+
 .transparent {
   color: rgba(255,255,255,0)
 }

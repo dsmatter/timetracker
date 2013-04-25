@@ -1,5 +1,7 @@
 <div .overlay>
   <i .animate-spin .icon-spin>
+<div .copybox>
+  <textarea #copytext />
 <div .row>
   <div .span6 .offset1>
     <h1 .logo>

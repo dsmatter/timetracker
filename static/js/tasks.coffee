@@ -49,7 +49,8 @@ define ['components/flight/lib/component', 'decorate', 'task'], (defineComponent
       $.ajax url,
         dataType: "json"
         success: (data) ->
-          window.prompt "Copy that:", JSON.stringify(data)
+          $(".copybox").show()
+          $("#copytext").text JSON.stringify(data)
 
     @after "initialize", ->
       @calculateTotal()

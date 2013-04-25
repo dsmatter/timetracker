@@ -5,6 +5,8 @@ requirejs.config
 requirejs ["decorate", "tasks", "task", "createTask", "total", "search"],
 (decorator, tasks, task, createTask, total, search) ->
   $("document").ready ->
+    $("body").dblclick ->
+      $(".copybox").hide()
     $("input").first().focus()
     decorator.decorateOverview()
     search.attachTo "#searchbar"
