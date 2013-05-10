@@ -29,7 +29,7 @@
               $forall (sid,  start, end) <- sess
                 <table .times>
                   <tr id="session-#{showKey sid}">
-                    <td> #{formatToD start}
+                    <td .starttime> #{formatToD start}
                     <td> -
-                    <td> #{formatToD end}
+                    <td .endtime> #{formatToD end}
                     <td> (#{showNominalDiffTime $ sessionDiff (sid, start, end)})

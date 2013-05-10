@@ -4,12 +4,14 @@ tmp_dir = "/tmp/timetracker-build"
 original_dir = Dir.pwd
 
 task :default => :pack_update
+task :compile => [:build_coffee, :compile_rjs]
+task :build_rjs => [:fetch_components, :minify_rjs, :compile_rjs]
 
 task :fetch_components do
   dir = Dir.pwd
   Dir.chdir("static/js")
   sh "bower install"
-  sh "cp components/jquery/jquery.min.js ."
+  sh "cp -f components/jquery/jquery.min.js ."
   Dir.chdir(dir)
 end
 
@@ -33,8 +35,11 @@ task :build_coffee do
   sh "coffee -c static/js"
 end
 
-task :build_rjs => :fetch_components do
+task :minify_rjs do
   sh "uglifyjs static/js/components/requirejs/require.js > static/js/require.min.js"
+end
+
+task :compile_rjs do
   sh "r.js -o build.js out=static/js/main.built.js"
 end
 

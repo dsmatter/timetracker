@@ -1,3 +1,13 @@
+<div .sessionEdit>
+  <label for="startTime"> Start
+  <input type="text" name="startTime" id="startTime" />
+  <label for="endTime"> End
+  <input type="text" name="endTime" id="endTime" />
+  <input type="hidden" id="editId" />
+  <p>
+    <input .left type="submit" id="editSubmit" value="Update" />
+    <input .right type="submit" id="editDelete" value="Delete" />
+
 <div .overlay>
   <i .animate-spin .icon-spin>
 <div .copybox>
@@ -9,10 +19,10 @@
     <h1> TimeTrackR
     <div #searchbar>
       <label for="search"> Search
-      <input type="search" name="search" placeholder="Search">
+      <input type="search" name="search" placeholder="Search" />
     <div #addtask>
       <label for="addtask"> Add a new task
-      <input type="text" name="addtask" placeholder"Add task">
+      <input type="text" name="addtask" placeholder="Add task" />
     <div .row>
       <div .span6>
         <h2> Tasks

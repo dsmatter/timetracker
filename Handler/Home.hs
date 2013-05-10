@@ -51,11 +51,17 @@ sessionDiff (_,s,e) = diffUTCTime (zonedTimeToUTC e) (zonedTimeToUTC s)
 taskTotalTime :: TaskInfo -> NominalDiffTime
 taskTotalTime = sum . map sessionDiff . sessions
 
+fullDateFormat :: String
+fullDateFormat = "%Y-%m-%d %H:%M"
+
 formatToD :: ZonedTime -> String
 formatToD = formatTime defaultTimeLocale "%H:%M"
 
 formatDate :: ZonedTime -> String
 formatDate = formatTime defaultTimeLocale "%Y-%m-%d"
+
+parseZonedTime :: Text -> Maybe ZonedTime
+parseZonedTime t = Data.Time.parseTime defaultTimeLocale fullDateFormat (T.unpack t) :: Maybe ZonedTime
 
 zonedTimeToMillies :: ZonedTime -> Int
 zonedTimeToMillies zt =
@@ -120,6 +126,13 @@ getUser = do
   case muser of
     Nothing -> permissionDenied "Login, please"
     Just u -> return u
+
+checkPostParameter :: Text -> Handler Text
+checkPostParameter pname = do
+  mparam <- lookupPostParam pname
+  case mparam of
+    Nothing -> invalidArgs [pname]
+    Just p -> return p
 
 checkTaskPermission :: Task -> Handler ()
 checkTaskPermission task' = do
@@ -258,3 +271,17 @@ deleteSessionR tlid = do
   checkTaskIdPermission $ taskLogTask session
   _ <- runDB $ delete tlid
   getPartialTaskHtml $ taskLogTask session
+
+postSessionR :: TaskLogId -> Handler RepHtml
+postSessionR tlid = do
+  session <- runDB $ fmap fromJust $ get tlid
+  checkTaskIdPermission $ taskLogTask session
+  start <- checkPostParameter "start"
+  end <- checkPostParameter "end"
+  let mstartTime = parseZonedTime start
+  let mendTime = parseZonedTime end
+  case [mstartTime, mendTime] of
+    [Just startTime, Just endTime] -> do
+      runDB $ update tlid [TaskLogStart =. startTime, TaskLogEnd =. endTime]
+      getPartialTaskHtml $ taskLogTask session
+    _ -> invalidArgs ["start", "end"]

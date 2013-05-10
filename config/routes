@@ -11,4 +11,4 @@
 /tasks/#TaskId/stop TaskStopR POST
 /tasks/#TaskId/summary TaskSummaryR GET
 /summary SummaryR GET
-/sessions/#TaskLogId SessionR DELETE
+/sessions/#TaskLogId SessionR POST DELETE
