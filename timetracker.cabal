@@ -19,7 +19,12 @@ library
                      Settings
                      Settings.StaticFiles
                      Settings.Development
+                     App.Task
+                     App.Tag
+                     App.Util
                      Handler.Home
+                     Handler.Api
+                     Handler.Summary
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -72,6 +77,7 @@ library
                  , conduit
                  , old-locale
                  , yesod-json
+                 , monad-logger
 
 executable         timetracker
     if flag(library-only)
