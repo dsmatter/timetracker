@@ -84,7 +84,7 @@ executable         timetracker
         Buildable: False
 
     main-is:           main.hs
-    hs-source-dirs:    app
+    hs-source-dirs:    App
     build-depends:     base
                      , timetracker
                      , yesod-default
