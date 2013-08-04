@@ -3,6 +3,9 @@ module Handler.Summary where
 
 import Import
 import Database.Persist.Store
+import Data.List (sortBy)
+import Data.Ord (comparing)
+import Data.Time.LocalTime (zonedTimeToUTC)
 import qualified Data.Text as T
 
 import App.Task
@@ -23,6 +26,7 @@ getSummaryR = do
       let taskIds = map (Key . PersistText) $ T.splitOn "-" stasks
       mapM_ checkTaskIdPermission taskIds
       taskInfos <- mapM getTaskInfo taskIds
+      let allSessions = sortBy (comparing startTime) . concat $ map sessions taskInfos
       let total = sum $ map taskTotalTime taskInfos
           json = object \
                   [ ("tasks" :: Text, toJSON taskInfos)
@@ -30,3 +34,4 @@ getSummaryR = do
                   ]
       defaultLayoutJson $(widgetFile "summary") json
 
+  where startTime (_,s,_) = zonedTimeToUTC s
